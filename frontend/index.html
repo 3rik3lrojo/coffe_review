@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Coffee Review ☕</title>
+
+  <style>
+    body {
+      font-family: system-ui;
+      background: #f5f7fb;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 480px;
+    }
+
+    h2 { text-align: center; }
+
+    label { margin-top: 12px; display: block; }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      margin-top: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      border-radius: 12px;
+      border: none;
+      background: #4f46e5;
+      color: white;
+      cursor: pointer;
+    }
+
+    .quality-label {
+      text-align: center;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>☕ Coffee Review</h2>
+
+  <form id="cafeForm">
+
+    <label>¿Quién?</label>
+    <select id="quien">
+      <option value="josune">Josune</option>
+      <option value="no_josune">No Josune</option>
+    </select>
+
+    <label><input type="checkbox" id="montoncillo"> Montoncillo</label>
+
+    <label>Salida</label>
+    <select id="salida">
+      <option value="derecha">Derecha</option>
+      <option value="izquierda">Izquierda</option>
+    </select>
+
+    <label>Calidad</label>
+    <input type="range" id="calidad" min="1" max="4" value="4">
+    <div id="qualityText" class="quality-label"></div>
+
+    <label>Cantidad</label>
+    <select id="cantidad">
+      <option value="solo">Solo</option>
+      <option value="varios">Varios</option>
+    </select>
+
+    <label>Fecha y hora</label>
+    <input type="datetime-local" id="fechaHora" required>
+
+    <label>Tipo</label>
+    <select id="tipo">
+      <option value="leche">Leche</option>
+      <option value="cortado">Cortado</option>
+    </select>
+
+    <button>Guardar</button>
+  </form>
+</div>
+
+<script>
+// ---- calidad ----
+const labels = {
+  4: "Bueno 😎",
+  3: "Meh 😐",
+  2: "Malillo 😕",
+  1: "Malo 💀"
+};
+
+const slider = document.getElementById("calidad");
+const qualityText = document.getElementById("qualityText");
+
+function updateQuality() {
+  qualityText.textContent = labels[slider.value];
+}
+slider.addEventListener("input", updateQuality);
+updateQuality();
+
+// ---- fecha por defecto (LOCAL España) ----
+window.addEventListener("DOMContentLoaded", () => {
+  const now = new Date();
+
+  const offset = now.getTimezoneOffset();
+  const local = new Date(now.getTime() - offset * 60000);
+
+  document.getElementById("fechaHora").value =
+    local.toISOString().slice(0,16);
+});
+
+// ---- submit ----
+document.getElementById("cafeForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const fechaInput = document.getElementById("fechaHora").value;
+
+  const data = {
+    quien: document.getElementById("quien").value,
+    montoncillo: document.getElementById("montoncillo").checked,
+    salida: document.getElementById("salida").value,
+    calidad: parseInt(slider.value),
+    cantidad: document.getElementById("cantidad").value,
+    tipo: document.getElementById("tipo").value,
+
+    // clave
+    fechaHoraLocal: fechaInput
+  };
+
+  await fetch("http://localhost:3000/api/cafe", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(data)
+  });
+
+  alert("Guardado ☕");
+});
+</script>
+
+</body>
+</html>
