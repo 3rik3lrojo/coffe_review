@@ -2,10 +2,14 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package.json ./
+# instalar deps
+COPY backend/package.json ./
 RUN npm install
 
-COPY . .
+# copiar backend
+COPY backend .
+
+COPY frontend ./frontend
 
 EXPOSE 3000
 

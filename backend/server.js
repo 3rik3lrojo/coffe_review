@@ -1,13 +1,26 @@
 import express from "express";
 import { MongoClient } from "mongodb";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ⚠️ usa "mongo" si estás con docker-compose
-// usa "localhost" si estás en local sin docker
+// --- paths para servir frontend ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const frontendPath = path.resolve("./frontend");
+
+app.use(express.static(frontendPath));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
+
+// --- Mongo ---
 const client = new MongoClient("mongodb://mongo:27017");
 
 let db;
@@ -15,11 +28,11 @@ let db;
 await client.connect();
 db = client.db("coffeeDB");
 
+// --- API ---
 app.post("/api/cafe", async (req, res) => {
   try {
     const d = req.body;
 
-    // validaciones
     if (!["josune", "josunent"].includes(d.quien)) {
       return res.status(400).json({ error: "quien inválido" });
     }
@@ -30,10 +43,7 @@ app.post("/api/cafe", async (req, res) => {
 
     const doc = {
       ...d,
-
-      // 👇 CLAVE: guardado como Date real
       fechaHora: d.fechaHora ? new Date(d.fechaHora) : new Date(),
-
       createdAt: new Date(),
     };
 
@@ -44,6 +54,11 @@ app.post("/api/cafe", async (req, res) => {
     console.error(e);
     res.status(500).json({ error: "server error" });
   }
+});
+
+// fallback para SPA / root
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 app.listen(3000, () => {
