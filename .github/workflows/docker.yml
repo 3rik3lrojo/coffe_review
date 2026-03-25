@@ -1,4 +1,4 @@
-name: Build Docker Image
+name: Build and Push Docker Image
 
 on:
   push:
@@ -13,21 +13,23 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-      - name: Log in to GHCR
-        uses: docker/login-action@v3
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Debug repo
-        run: ls -R
-      - name: Build image
-        run: |
-          docker build -t ghcr.io/${{ github.repository }}/backend:latest ./backend
 
-      - name: Push image
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ghcr.io/${{ github.repository }}/backend:latest \
+            -f backend/Dockerfile \
+            .
+
+      - name: Push Docker image
         run: |
           docker push ghcr.io/${{ github.repository }}/backend:latest
