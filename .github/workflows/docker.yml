@@ -22,7 +22,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Debug repo
+        run: ls -R
       - name: Build image
         run: |
           docker build -t ghcr.io/${{ github.repository }}/backend:latest ./backend
