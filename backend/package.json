@@ -1,0 +1,15 @@
+{
+  "name": "coffee-backend",
+  "version": "1.0.0",
+  "description": "Backend para Coffee Review",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongodb": "^6.0.0",
+    "cors": "^2.8.5"
+  }
+}
