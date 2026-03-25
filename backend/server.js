@@ -6,7 +6,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const client = new MongoClient("mongodb://localhost:27017");
+// ⚠️ usa "mongo" si estás con docker-compose
+// usa "localhost" si estás en local sin docker
+const client = new MongoClient("mongodb://mongo:27017");
 
 let db;
 
@@ -17,37 +19,30 @@ app.post("/api/cafe", async (req, res) => {
   try {
     const d = req.body;
 
-    // VALIDACIONES
-    if (!["josune","no_josune"].includes(d.quien)) {
-      return res.status(400).json({error: "quien inválido"});
+    // validaciones
+    if (!["josune", "josunent"].includes(d.quien)) {
+      return res.status(400).json({ error: "quien inválido" });
     }
 
-    if (![1,2,3,4].includes(d.calidad)) {
-      return res.status(400).json({error: "calidad inválida"});
+    if (![1, 2, 3, 4].includes(d.calidad)) {
+      return res.status(400).json({ error: "calidad inválida" });
     }
-
-    // CONVERSIÓN CORRECTA
-    const fechaUTC = d.fechaHoraLocal
-      ? new Date(d.fechaHoraLocal)
-      : new Date();
 
     const doc = {
       ...d,
 
-      // clave timezone-safe
-      fechaHoraUTC: fechaUTC,
-      timezone: "Europe/Madrid",
+      // 👇 CLAVE: guardado como Date real
+      fechaHora: d.fechaHora ? new Date(d.fechaHora) : new Date(),
 
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     await db.collection("cafes").insertOne(doc);
 
-    res.json({ok: true});
-
+    res.json({ ok: true });
   } catch (e) {
     console.error(e);
-    res.status(500).json({error: "server error"});
+    res.status(500).json({ error: "server error" });
   }
 });
 
