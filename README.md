@@ -1,32 +1,56 @@
 # ☕ Coffee Review
 
-Registro de cafés con almacenamiento correcto de fechas sin problemas de zona horaria.
+Aplicación web para registrar y analizar cafés.
+
+Permite:
+- Registrar cafés con distintos parámetros
+- Guardar datos en MongoDB
+- Visualizar historial en tiempo real
 
 ---
 
-## 🧠 Modelo de fecha
+## 🧱 Arquitectura
 
-Se guardan tres campos:
+El sistema está compuesto por:
 
-- `fechaHoraLocal` → lo que introduce el usuario (hora España)
-- `fechaHoraUTC` → fecha en UTC (para cálculos)
-- `timezone` → "Europe/Madrid"
-
-Esto evita errores con horario de verano (DST).
-
----
-
-## ⚙️ Requisitos
-
-- Node.js
-- MongoDB local
+- Frontend → HTML + JS (servido por Express)
+- Backend → Node.js + Express
+- Base de datos → MongoDB
+- Contenedores → Docker + Docker Compose
 
 ---
 
-## 🚀 Instalación
+## 📁 Estructura del proyecto
 
-### 1. Clonar repo
+coffe_review/
+├── backend/
+│   ├── server.js
+│   ├── package.json
+│   └── Dockerfile
+├── frontend/
+│   └── index.html
+├── docker-compose.yml
+└── .github/workflows/docker.yml
 
-```bash
-git clone <repo>
-cd coffe_review
+---
+
+## 🚀 Ejecutar en local
+
+Requisitos:
+- Docker
+- Docker Compose
+
+Ejecutar:
+docker-compose up --build
+
+Acceso:
+http://localhost:3000
+
+---
+
+## 🧪 Ver datos en Mongo
+
+docker exec -it coffee_mongo mongosh
+
+use coffeeDB
+db.cafes.find().pretty()
